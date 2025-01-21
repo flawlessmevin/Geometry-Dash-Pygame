@@ -9,7 +9,7 @@ class Game:
         self.screen_width = 800
         self.screen_height = 600
         self.screen = pygame.display.set_mode((self.screen_width, self.screen_height))
-        pygame.display.set_caption("Geometry Dash Clone")
+        pygame.display.set_caption("Geometry Dash beta))")
 
         self.clock = pygame.time.Clock()
 
@@ -52,8 +52,11 @@ class Game:
 
             self.player.apply_gravity(self.level.collided_objects)
             self.level.move_level()
-
             self.draw_background()
+
+            self.level.draw_progress_bar(self.screen)
+
+
             self.draw_ground()
             self.check_collisions()
             self.level.draw(self.screen)
@@ -77,6 +80,9 @@ class Game:
                 elif obj["type"] == "^":
                     if self.player.get_rect().colliderect(obj["rect"]):
                         self.restart_game()
+
+
+
 
     def restart_game(self):
 

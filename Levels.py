@@ -16,6 +16,8 @@ class Level:
         self.load_level()
         self.images = self.load_images()
         self.offset = 0
+        self.level_length = 0
+        print(len(self.grid[0]) * 50)
 
     def move_level(self):
         self.offset += 5
@@ -33,6 +35,7 @@ class Level:
 
         for row_idx, row in enumerate(self.grid):
             for col_idx, symbol in enumerate(row):
+
                 if symbol in self.SYMBOLS and self.SYMBOLS[symbol] is not None:
 
                     x = col_idx * self.TILE_SIZE
@@ -58,3 +61,26 @@ class Level:
                     x = (col_idx * self.TILE_SIZE) - self.offset
                     y = 450 - self.TILE_SIZE
                     screen.blit(self.images[symbol], (x, y))
+
+    def get_progress(self):
+        level_length = len(self.grid[0]) * self.TILE_SIZE
+        progress = (self.offset / level_length) * 100
+        return progress
+
+    def draw_progress_bar(self, screen):
+        progress = self.get_progress()
+        bar_width = screen.get_width() * 0.8
+        bar_height = 30
+
+        pygame.draw.rect(screen, (50, 50, 50), (screen.get_width() * 0.1, 10, bar_width, bar_height))
+        pygame.draw.rect(screen, (0, 255, 0), (screen.get_width() * 0.1, 10, (bar_width * progress) / 100, bar_height))
+
+        font = pygame.font.Font("assets/fonts/ARCADECLASSIC.TTF", 36)  # Шрифт и размер
+        text = font.render(f"{int(progress)}", True, (255, 255, 255))  # Текст с процентами
+
+        # Позиция текста (по центру прогресс-бара)
+        text_x = screen.get_width() * 0.1 + bar_width / 2 - text.get_width() / 2
+        text_y = 10 + (bar_height - text.get_height()) / 2
+
+        # Отображаем текст
+        screen.blit(text, (text_x, text_y))
