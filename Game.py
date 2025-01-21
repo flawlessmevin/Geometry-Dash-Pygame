@@ -21,6 +21,8 @@ class Game:
         self.player = Player(100, 450)
         self.level = Level("assets/levels.txt")
 
+
+
     def draw_background(self):
         self.screen.blit(self.background_image, (0, 0))
 
@@ -39,20 +41,45 @@ class Game:
                 if event.type == pygame.QUIT:
                     self.running = False
 
+
+                if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                    self.player.jump()
+
+
             keys = pygame.key.get_pressed()
             if keys[pygame.K_SPACE]:
                 self.player.jump()
 
-            self.player.apply_gravity()
+            self.player.apply_gravity(self.level.collided_objects)
             self.level.move_level()
 
             self.draw_background()
             self.draw_ground()
+            self.check_collisions()
             self.level.draw(self.screen)
             self.player.draw(self.screen)
+
 
             pygame.display.update()
 
             self.clock.tick(60)
 
         pygame.quit()
+
+    def check_collisions(self):
+        for obj in self.level.collided_objects:
+            if obj["rect"].colliderect(self.player.get_rect()):
+                if obj["type"] == "#":
+                    if self.player.get_rect().colliderect(obj["rect"]):
+                        if self.player.get_rect().right > obj["rect"].left and self.player.get_rect().left < obj[
+                            "rect"].left:
+                            self.restart_game()
+                elif obj["type"] == "^":
+                    if self.player.get_rect().colliderect(obj["rect"]):
+                        self.restart_game()
+
+    def restart_game(self):
+
+        self.player = Player(100, 450)
+        self.level = Level("assets/levels.txt")
+        self.game_loop()
