@@ -11,9 +11,21 @@ class Game:
         self.screen = pygame.display.set_mode((self.screen_width, self.screen_height))
         pygame.display.set_caption("Geometry Dash beta))")
 
+        self.game_won = False
+
         self.clock = pygame.time.Clock()
 
         self.running = True
+
+        pygame.mixer.music.load("assets/sounds/background_music.mp3")
+
+        pygame.mixer.music.play(-1)
+
+        self.death_sound = pygame.mixer.Sound("assets/sounds/death_sound.mp3")
+
+
+        self.win_sound = pygame.mixer.Sound("assets/sounds/win_sound.wav")
+        self.win_sound.set_volume(1)
 
         self.background_image = pygame.image.load("assets/images/background.png")
         self.background_image = pygame.transform.scale(self.background_image, (self.screen_width, self.screen_height))
@@ -74,28 +86,37 @@ class Game:
             if obj["rect"].colliderect(self.player.get_rect()):
                 if obj["type"] == "#":
                     if self.player.get_rect().colliderect(obj["rect"]):
-                        if self.player.get_rect().right > obj["rect"].left and self.player.get_rect().left < obj[
-                            "rect"].left:
+                        if self.player.get_rect().right > obj["rect"].left and self.player.get_rect().left < obj["rect"].left:
+                            self.death_sound.play()
                             self.restart_game()
                 elif obj["type"] == "^":
                     if self.player.get_rect().colliderect(obj["rect"]):
+                        self.death_sound.play()
                         self.restart_game()
 
                 elif obj["type"] == "@":
                     if self.player.get_rect().colliderect(obj["rect"]):
-                        self.win_game()
+                        if not self.game_won:
+                            self.win_game()
 
 
 
 
 
     def restart_game(self):
+        pygame.mixer.music.stop()
+        pygame.mixer.music.play(-1)
 
         self.player = Player(100, 450)
         self.level = Level("assets/levels.txt")
         self.game_loop()
 
 
+
+
     def win_game(self):
-        print("Game Over")
+        self.game_won = True
+        pygame.mixer.music.stop()
+        self.win_sound.play()
+
 

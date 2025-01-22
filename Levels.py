@@ -18,7 +18,7 @@ class Level:
         self.images = self.load_images()
         self.offset = 0
         self.level_length = 0
-        print(len(self.grid[0]) * 50)
+
 
     def move_level(self):
         self.offset += 5
@@ -68,6 +68,7 @@ class Level:
     def get_progress(self):
         level_length = (len(self.grid[0]) * self.TILE_SIZE) - 150
         progress = (self.offset / level_length) * 100
+        progress = min(progress, 100)
         return progress
 
     def draw_progress_bar(self, screen):
