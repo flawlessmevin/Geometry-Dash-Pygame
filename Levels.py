@@ -6,6 +6,7 @@ class Level:
     SYMBOLS = {
         "#": "assets/images/cube.png",
         "^": "assets/images/triangle.png",
+        "@": "assets/images/portal.png",
         ".": None
     }
 
@@ -35,12 +36,14 @@ class Level:
 
         for row_idx, row in enumerate(self.grid):
             for col_idx, symbol in enumerate(row):
-
                 if symbol in self.SYMBOLS and self.SYMBOLS[symbol] is not None:
-
                     x = col_idx * self.TILE_SIZE
                     y = 450 - self.TILE_SIZE
-                    rect = pygame.Rect(x, y, self.TILE_SIZE, self.TILE_SIZE)
+                    if symbol == "@":
+                        rect = pygame.Rect(x, y - 150, self.TILE_SIZE * 2, self.TILE_SIZE * 2)
+                    else:
+                        rect = pygame.Rect(x, y, self.TILE_SIZE, self.TILE_SIZE)
+
                     self.collided_objects.append({"rect": rect, "type": symbol})
 
 
@@ -51,19 +54,19 @@ class Level:
         for symbol, path in self.SYMBOLS.items():
             if path:
                 images[symbol] = pygame.image.load(path)
-                images[symbol] = pygame.transform.scale(images[symbol], (self.TILE_SIZE, self.TILE_SIZE))
+                if symbol == "@":
+                    images[symbol] = pygame.transform.scale(images[symbol], (self.TILE_SIZE * 4, self.TILE_SIZE * 4))
+                else:
+                    images[symbol] = pygame.transform.scale(images[symbol], (self.TILE_SIZE, self.TILE_SIZE))
         return images
 
     def draw(self, screen):
-        for row_idx, row in enumerate(self.grid):
-            for col_idx, symbol in enumerate(row):
-                if symbol in self.images:
-                    x = (col_idx * self.TILE_SIZE) - self.offset
-                    y = 450 - self.TILE_SIZE
-                    screen.blit(self.images[symbol], (x, y))
+        for obj in self.collided_objects:
+            if obj["type"] in self.images:
+                screen.blit(self.images[obj["type"]], (obj["rect"].x, obj["rect"].y))
 
     def get_progress(self):
-        level_length = len(self.grid[0]) * self.TILE_SIZE
+        level_length = (len(self.grid[0]) * self.TILE_SIZE) - 150
         progress = (self.offset / level_length) * 100
         return progress
 
@@ -75,12 +78,12 @@ class Level:
         pygame.draw.rect(screen, (50, 50, 50), (screen.get_width() * 0.1, 10, bar_width, bar_height))
         pygame.draw.rect(screen, (0, 255, 0), (screen.get_width() * 0.1, 10, (bar_width * progress) / 100, bar_height))
 
-        font = pygame.font.Font("assets/fonts/ARCADECLASSIC.TTF", 36)  # Шрифт и размер
-        text = font.render(f"{int(progress)}", True, (255, 255, 255))  # Текст с процентами
+        font = pygame.font.Font("assets/fonts/ARCADECLASSIC.TTF", 36)
+        text = font.render(f"{int(progress)}", True, (255, 255, 255))
 
-        # Позиция текста (по центру прогресс-бара)
+
         text_x = screen.get_width() * 0.1 + bar_width / 2 - text.get_width() / 2
         text_y = 10 + (bar_height - text.get_height()) / 2
 
-        # Отображаем текст
+
         screen.blit(text, (text_x, text_y))

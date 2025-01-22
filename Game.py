@@ -81,6 +81,11 @@ class Game:
                     if self.player.get_rect().colliderect(obj["rect"]):
                         self.restart_game()
 
+                elif obj["type"] == "@":
+                    if self.player.get_rect().colliderect(obj["rect"]):
+                        self.win_game()
+
+
 
 
 
@@ -89,3 +94,8 @@ class Game:
         self.player = Player(100, 450)
         self.level = Level("assets/levels.txt")
         self.game_loop()
+
+
+    def win_game(self):
+        print("Game Over")
+
