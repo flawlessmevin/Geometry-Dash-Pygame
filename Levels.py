@@ -19,7 +19,6 @@ class Level:
         self.offset = 0
         self.level_length = 0
 
-
     def move_level(self):
         self.offset += 5
 
@@ -31,7 +30,6 @@ class Level:
             lines = file.readlines()
 
         self.grid = [line.strip() for line in lines if line.strip() and not line.startswith("Level")]
-
         self.collided_objects = []
 
         for row_idx, row in enumerate(self.grid):
@@ -45,9 +43,6 @@ class Level:
                         rect = pygame.Rect(x, y, self.TILE_SIZE, self.TILE_SIZE)
 
                     self.collided_objects.append({"rect": rect, "type": symbol})
-
-
-
 
     def load_images(self):
         images = {}
@@ -82,9 +77,6 @@ class Level:
         font = pygame.font.Font("assets/fonts/ARCADECLASSIC.TTF", 36)
         text = font.render(f"{int(progress)}", True, (255, 255, 255))
 
-
         text_x = screen.get_width() * 0.1 + bar_width / 2 - text.get_width() / 2
         text_y = 10 + (bar_height - text.get_height()) / 2
-
-
         screen.blit(text, (text_x, text_y))

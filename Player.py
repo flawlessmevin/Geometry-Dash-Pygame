@@ -8,7 +8,6 @@ class Player:
         self.height = 50
         self.velocity_y = 0
         self.is_jumping = False
-
         self.image = pygame.image.load(image_path)
         self.image = pygame.transform.scale(self.image, (self.width, self.height))
 
