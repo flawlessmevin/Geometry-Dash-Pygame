@@ -4,14 +4,16 @@ from Levels import Level
 
 class Game:
     def __init__(self):
+        self.running = None
         pygame.init()
         self.screen_width = 800
         self.screen_height = 600
         self.screen = pygame.display.set_mode((self.screen_width, self.screen_height))
         pygame.display.set_caption("Geometry Dash beta))")
-        self.game_won = False
+        self.game_status = 0 # 0-not started or started, 1 - win, 2 - lose
         self.clock = pygame.time.Clock()
-        self.running = True
+
+        self.button_text = "START"
 
         pygame.mixer.music.load("assets/sounds/background_music.mp3")
         pygame.mixer.music.play(-1)
@@ -23,6 +25,7 @@ class Game:
 
         self.player = Player(100, 450)
         self.level = Level("assets/levels.txt")
+        self.menu()
 
     def draw_background(self):
         self.screen.blit(self.background_image, (0, 0))
@@ -68,16 +71,21 @@ class Game:
                 if obj["type"] == "#":
                     if self.player.get_rect().colliderect(obj["rect"]):
                         if self.player.get_rect().right > obj["rect"].left and self.player.get_rect().left < obj["rect"].left:
+                            self.game_status = 2
                             self.death_sound.play()
-                            self.restart_game()
+                            self.menu()
+
                 elif obj["type"] == "^":
                     if self.player.get_rect().colliderect(obj["rect"]):
+                        self.game_status = 2
                         self.death_sound.play()
-                        self.restart_game()
+                        self.menu()
+
                 elif obj["type"] == "@":
                     if self.player.get_rect().colliderect(obj["rect"]):
-                        if not self.game_won:
-                            self.win_game()
+                        self.win_sound.play()
+                        self.game_status = 1
+                        self.menu()
 
     def restart_game(self):
         pygame.mixer.music.stop()
@@ -87,19 +95,26 @@ class Game:
         self.level = Level("assets/levels.txt")
         self.game_loop()
 
-    def win_game(self):
-        self.game_won = True
+    def menu(self):
+        if self.game_status != 0:
+            self.button_text = "RESTART"
+        self.draw_background()
+        self.running = True
         pygame.mixer.music.stop()
-        self.win_sound.play()
-
         overlay = pygame.Surface((self.screen_width, self.screen_height), pygame.SRCALPHA)
 
         font = pygame.font.Font("assets/fonts/ARCADECLASSIC.TTF", 72)
-        text = font.render("YOU WIN", True, (255, 255, 255))
+        if self.game_status == 1:
+            text = font.render("YOU WIN", True, (255, 255, 255))
+        elif self.game_status == 2:
+            text = font.render("YOU   LOSE", True, (255, 255, 255))
+        else:
+            text = font.render("WE LCOME", True, (255, 255, 255))
+
         text_rect = text.get_rect(center=(self.screen_width // 2, self.screen_height // 3))
 
         button_font = pygame.font.Font("assets/fonts/ARCADECLASSIC.TTF", 36)
-        restart_button = self.create_buttons((self.screen_width // 2 - 150, self.screen_height // 2), "Restart", button_font)
+        restart_button = self.create_buttons((self.screen_width // 2 - 150, self.screen_height // 2), self.button_text, button_font)
         exit_button = self.create_buttons((self.screen_width // 2 - 150, self.screen_height // 2 + 100), "Exit", button_font)
 
         while True:
@@ -112,6 +127,8 @@ class Game:
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
+                    self.win_sound.stop()
+                    self.death_sound.stop()
                     pygame.quit()
                     exit()
                 if event.type == pygame.MOUSEBUTTONDOWN:
@@ -122,7 +139,8 @@ class Game:
                         pygame.quit()
                         exit()
 
-    def create_buttons(self, position, text, font):
+    @staticmethod
+    def create_buttons(position, text, font):
         button_surface = pygame.Surface((300, 50))
         button_surface.fill((75, 75, 75))
 
