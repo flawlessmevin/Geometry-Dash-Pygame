@@ -1,15 +1,14 @@
 import pygame
+from Settings import *
 
 class Player:
     def __init__(self, x, y, image_path="assets/images/sprite.png"):
         self.x = x
         self.y = y
-        self.width = 50
-        self.height = 50
         self.velocity_y = 0
         self.is_jumping = False
         self.image = pygame.image.load(image_path)
-        self.image = pygame.transform.scale(self.image, (self.width, self.height))
+        self.image = pygame.transform.scale(self.image, (TILE_SIZE, TILE_SIZE))
 
     def jump(self):
         if not self.is_jumping:
@@ -24,11 +23,11 @@ class Player:
             if obj["type"] == "#":
                 if obj["rect"].collidepoint(self.get_rect().centerx, self.get_rect().bottom):
                     self.velocity_y = 0
-                    self.y = obj["rect"].top - self.height
+                    self.y = obj["rect"].top - TILE_SIZE
                     self.is_jumping = False
 
-        if self.y > 450 - self.height:
-            self.y = 450 - self.height
+        if self.y > SCREEN_HEIGHT - (SCREEN_HEIGHT/ 4) - TILE_SIZE:
+            self.y = SCREEN_HEIGHT - (SCREEN_HEIGHT/ 4) - TILE_SIZE
             self.velocity_y = 0
             self.is_jumping = False
 
@@ -36,4 +35,4 @@ class Player:
         screen.blit(self.image, (self.x, self.y))
 
     def get_rect(self):
-        return pygame.Rect(self.x, self.y, self.width, self.height)
+        return pygame.Rect(self.x, self.y, TILE_SIZE, TILE_SIZE)
