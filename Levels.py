@@ -39,8 +39,8 @@ class Level:
 
         for i in range(LEVEL_LENGTH // 5):
             level += random.choice(patterns)
-
-        level = ".........." + level[:LEVEL_LENGTH - 10] + ".........@"
+        #level = "######################################################################"
+        level = ".........." + level[:LEVEL_LENGTH - 15] + ".........@"
         self.level_grid = [level]
 
         self.collided_objects = []
