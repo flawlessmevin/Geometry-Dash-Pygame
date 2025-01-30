@@ -86,7 +86,7 @@ class Game:
                         self.menu()
 
                 elif obj["type"] == "@":
-                    if self.player.get_rect().colliderect(obj["rect"]):
+                    if self.player.get_rect().centerx >= obj["rect"].centerx:
                         self.win_sound.play()
                         self.game_status = 1
                         self.menu()
@@ -155,6 +155,5 @@ class Game:
         button_rect = button_surface.get_rect(topleft=position)
 
         return button_surface, button_rect
-
 
 

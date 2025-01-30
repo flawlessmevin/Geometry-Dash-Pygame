@@ -51,7 +51,7 @@ class Level:
                     x = col_idx * TILE_SIZE
                     y = SCREEN_HEIGHT - (SCREEN_HEIGHT/ 4) - TILE_SIZE
                     if symbol == "@":
-                        rect = pygame.Rect(x, y - 150, TILE_SIZE * 2, TILE_SIZE * 2)
+                        rect = pygame.Rect(x, y - 150, TILE_SIZE * 4 , TILE_SIZE * 4)
                     else:
                         rect = pygame.Rect(x, y, TILE_SIZE, TILE_SIZE)
                     self.collided_objects.append({"rect": rect, "type": symbol})
