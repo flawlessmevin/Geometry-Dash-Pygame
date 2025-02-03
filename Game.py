@@ -67,8 +67,9 @@ class Game:
             self.draw_ground()
             self.check_collisions()
             self.level.draw(self.screen)
+            self.player.update()
             self.player.draw(self.screen)
-            self.player.draw_bonus_timer(self.screen)
+
 
             pygame.display.update()
 
@@ -100,12 +101,15 @@ class Game:
 
                     elif obj["type"] == "*":
                         if self.player.get_rect().colliderect(obj["rect"]):
-                            self.player.enable_bonus()
+                            self.level.collided_objects.remove(obj)
+                            self.coin_sound.play()
+                            self.player.add_bonus_time(3000)
 
                 else:
                     if obj["type"] == "*":
                         self.coin_sound.play()
                         self.level.collided_objects.remove(obj)
+                        self.player.add_bonus_time(3000)
                     elif obj["type"] == "^" or obj["type"] == "#":
                         self.level.eliminate_object(obj)
 

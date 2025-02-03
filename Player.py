@@ -2,6 +2,7 @@
 
 import pygame
 from Settings import *
+from BonusTimer import BonusTimer
 import threading
 
 class Player:
@@ -14,16 +15,7 @@ class Player:
         self.bonus_time = 0
         self.images = [pygame.image.load(path) for path in image_paths]
         self.image = pygame.transform.scale(self.images[0], (TILE_SIZE, TILE_SIZE))
-
-    def enable_bonus(self):
-        self.bonus = True
-        self.bonus_time = pygame.time.get_ticks() + 3000
-        threading.Timer(3, self.disable_bonus).start()
-
-    def disable_bonus(self):
-        self.bonus_time = 0
-        self.bonus = False
-
+        self.bonus_timer = BonusTimer(self)
 
 
 
@@ -32,6 +24,7 @@ class Player:
             self.velocity_y = -15
             self.is_jumping = True
             self.image = pygame.transform.scale(self.images[1], (TILE_SIZE, TILE_SIZE))
+
 
     def apply_gravity(self, collided_objects):
         self.velocity_y += 1
@@ -53,26 +46,19 @@ class Player:
             self.image = pygame.transform.scale(self.images[0], (TILE_SIZE, TILE_SIZE))
 
 
+    def add_bonus_time(self, duration):
+        self.bonus_timer.add_time(duration)
 
+
+    def update(self):
+        self.bonus_timer.update()
 
 
     def draw(self, screen):
-
         screen.blit(self.image, (self.x, self.y))
-
-    def draw_bonus_timer(self, screen):
-        font = pygame.font.Font(pygame.font.get_default_font(), 50)
-        #font = pygame.font.Font(FONT, 50)
         if self.bonus:
-            remaining_time_ms = max(0, self.bonus_time - pygame.time.get_ticks())
-            seconds = remaining_time_ms // 1000
-            milliseconds = remaining_time_ms % 1000
+            self.bonus_timer.draw_bonus_timer(screen)
 
-
-            time_str = f"{seconds}.{milliseconds // 10:02d}"
-            text = font.render(time_str, True, (255, 255, 255))
-            text_rect = text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2))
-            screen.blit(text, text_rect)
 
     def get_rect(self):
         return pygame.Rect(self.x, self.y, TILE_SIZE, TILE_SIZE)
