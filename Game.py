@@ -4,6 +4,7 @@ import Settings
 from Player import Player
 from Levels import Level
 from Settings import *
+from Menu import Menu
 
 class Game:
     def __init__(self):
@@ -17,6 +18,8 @@ class Game:
         self.game_status = 0 # 0-not started or started, 1 - win, 2 - lose
         self.clock = pygame.time.Clock()
 
+        self.menu = Menu(self)
+
 
         self.button_text = "START"
 
@@ -24,12 +27,14 @@ class Game:
         pygame.mixer.music.play(-1)
         self.death_sound = pygame.mixer.Sound("assets/sounds/death_sound.mp3")
         self.win_sound = pygame.mixer.Sound("assets/sounds/win_sound.wav")
+        self.coin_sound = pygame.mixer.Sound("assets/sounds/coin_sound.wav")
+
 
         self.background_image = pygame.image.load("assets/images/background.png")
         self.background_image = pygame.transform.scale(self.background_image, (SCREEN_WIDTH, SCREEN_HEIGHT))
 
 
-        self.menu()
+        self.menu.show_menu()
 
     def draw_background(self):
         self.screen.blit(self.background_image, (0, 0))
@@ -63,6 +68,7 @@ class Game:
             self.check_collisions()
             self.level.draw(self.screen)
             self.player.draw(self.screen)
+            self.player.draw_bonus_timer(self.screen)
 
             pygame.display.update()
 
@@ -72,24 +78,38 @@ class Game:
     def check_collisions(self):
         for obj in self.level.collided_objects:
             if obj["rect"].colliderect(self.player.get_rect()):
-                if obj["type"] == "#":
-                    if self.player.get_rect().colliderect(obj["rect"]):
-                        if self.player.get_rect().right > obj["rect"].left and self.player.get_rect().left < obj["rect"].left:
+                if not self.player.bonus:
+                    if obj["type"] == "#":
+                        if self.player.get_rect().colliderect(obj["rect"]):
+                            if self.player.get_rect().right > obj["rect"].left and self.player.get_rect().left < obj["rect"].left:
+                                self.game_status = 2
+                                self.death_sound.play()
+                                self.menu.show_menu()
+
+                    elif obj["type"] == "^":
+                        if self.player.get_rect().colliderect(obj["rect"]):
                             self.game_status = 2
                             self.death_sound.play()
-                            self.menu()
+                            self.menu.show_menu()
 
-                elif obj["type"] == "^":
-                    if self.player.get_rect().colliderect(obj["rect"]):
-                        self.game_status = 2
-                        self.death_sound.play()
-                        self.menu()
+                    elif obj["type"] == "@":
+                        if self.player.get_rect().centerx >= obj["rect"].centerx:
+                            self.win_sound.play()
+                            self.game_status = 1
+                            self.menu.show_menu()
 
-                elif obj["type"] == "@":
-                    if self.player.get_rect().centerx >= obj["rect"].centerx:
-                        self.win_sound.play()
-                        self.game_status = 1
-                        self.menu()
+                    elif obj["type"] == "*":
+                        if self.player.get_rect().colliderect(obj["rect"]):
+                            self.player.enable_bonus()
+
+                else:
+                    if obj["type"] == "*":
+                        self.coin_sound.play()
+                        self.level.collided_objects.remove(obj)
+                    elif obj["type"] == "^" or obj["type"] == "#":
+                        self.level.eliminate_object(obj)
+
+
 
     def start_game(self):
         pygame.mixer.music.stop()
@@ -97,63 +117,9 @@ class Game:
         self.win_sound.stop()
         self.player = Player(SCREEN_WIDTH/ 4, SCREEN_HEIGHT - (SCREEN_HEIGHT/ 4) - TILE_SIZE)
         self.level = Level()
+        self.running = True
         self.game_loop()
 
-    def menu(self):
-        if self.game_status != 0:
-            self.button_text = "RESTART"
-        self.draw_background()
-        self.running = True
-        pygame.mixer.music.stop()
-        overlay = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.SRCALPHA)
 
-        font = pygame.font.Font("assets/fonts/ARCADECLASSIC.TTF", 72)
-        if self.game_status == 1:
-            text = font.render("YOU WIN", True, (255, 255, 255))
-        elif self.game_status == 2:
-            text = font.render("YOU   LOSE", True, (255, 255, 255))
-        else:
-            text = font.render("WE LCOME", True, (255, 255, 255))
-
-        text_rect = text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 3))
-
-        button_font = pygame.font.Font("assets/fonts/ARCADECLASSIC.TTF", 36)
-        restart_button = self.create_buttons((SCREEN_WIDTH // 2 - 150, SCREEN_HEIGHT // 2), self.button_text, button_font)
-        exit_button = self.create_buttons((SCREEN_WIDTH // 2 - 150, SCREEN_HEIGHT // 2 + 100), "Exit", button_font)
-
-        while True:
-            self.screen.blit(overlay, (0, 0))
-            self.screen.blit(text, text_rect)
-            self.screen.blit(*restart_button)
-            self.screen.blit(*exit_button)
-
-            pygame.display.update()
-
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    self.win_sound.stop()
-                    self.death_sound.stop()
-                    pygame.quit()
-                    exit()
-                if event.type == pygame.MOUSEBUTTONDOWN:
-                    if restart_button[1].collidepoint(event.pos):
-                        self.start_game()
-                        return
-                    if exit_button[1].collidepoint(event.pos):
-                        pygame.quit()
-                        exit()
-
-    @staticmethod
-    def create_buttons(position, text, font):
-        button_surface = pygame.Surface((300, 50))
-        button_surface.fill((75, 75, 75))
-
-        text_surface = font.render(text, True, (255, 255, 255))
-        text_rect = text_surface.get_rect(center=(150, 25))
-        button_surface.blit(text_surface, text_rect)
-
-        button_rect = button_surface.get_rect(topleft=position)
-
-        return button_surface, button_rect
 
 

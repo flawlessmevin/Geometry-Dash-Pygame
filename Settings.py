@@ -1,6 +1,7 @@
 import os
 
 
+
 SETTINGS_FILE = "Settings.txt"
 
 
@@ -23,7 +24,7 @@ LEVEL_LENGTH = int(settings.get("LEVEL_LENGTH", 20))
 
 
 
-FONT = settings.get("FONT", "assets/fonts/ARCADECLASSIC.TTF")
+FONT = "assets/fonts/ARCADECLASSIC.TTF"
 
 PLAYER_IMAGES = ["assets/images/sprite.png",
                  "assets/images/sprite_jumping.png"

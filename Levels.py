@@ -1,4 +1,5 @@
 from Settings import *
+
 import random
 
 
@@ -11,6 +12,7 @@ class Level:
         "#": "assets/images/cube.png",
         "^": "assets/images/triangle.png",
         "@": "assets/images/portal.png",
+        "*": "assets/images/bonus_coin.png",
         ".": None
     }
 
@@ -18,9 +20,11 @@ class Level:
         self.file_path = "assets/level_patterns.txt"
         self.collided_objects = []
         self.level_grid = []
+
         self.generate_level()
         self.images = self.load_images()
         self.offset = 0
+        self.explosion_sound = pygame.mixer.Sound("assets/sounds/explosion_sound.wav")
 
 
 
@@ -29,6 +33,8 @@ class Level:
 
         for obj in self.collided_objects:
             obj["rect"].x -= 5
+
+
 
     def generate_level(self):
         with open(self.file_path, "r") as file:
@@ -39,8 +45,17 @@ class Level:
 
         for i in range(LEVEL_LENGTH // 5):
             level += random.choice(patterns)
-        #level = "######################################################################"
-        level = ".........." + level[:LEVEL_LENGTH - 15] + ".........@"
+        level = list(level)
+        for i in range(len(level)):
+            if level[i] == "." and random.random() < 0.1:
+                level[i] = "*"
+                print(i)
+        level = "".join(level)
+        level = "..............#####*#################################################################"
+        #level = ".........." + level[:LEVEL_LENGTH - 15] + ".........@"
+
+
+
         self.level_grid = [level]
 
         self.collided_objects = []
@@ -52,6 +67,8 @@ class Level:
                     y = SCREEN_HEIGHT - (SCREEN_HEIGHT/ 4) - TILE_SIZE
                     if symbol == "@":
                         rect = pygame.Rect(x, y - 150, TILE_SIZE * 4 , TILE_SIZE * 4)
+                    elif symbol == "*":
+                        rect = pygame.Rect(x + TILE_SIZE/4, y+TILE_SIZE/4, TILE_SIZE/2, TILE_SIZE/2)
                     else:
                         rect = pygame.Rect(x, y, TILE_SIZE, TILE_SIZE)
                     self.collided_objects.append({"rect": rect, "type": symbol})
@@ -64,14 +81,27 @@ class Level:
                 images[symbol] = pygame.image.load(path)
                 if symbol == "@":
                     images[symbol] = pygame.transform.scale(images[symbol], (TILE_SIZE * 4, TILE_SIZE * 4))
+                elif symbol == "*":
+                    images[symbol] = pygame.transform.scale(images[symbol], (TILE_SIZE/2, TILE_SIZE/2))
                 else:
                     images[symbol] = pygame.transform.scale(images[symbol], (TILE_SIZE, TILE_SIZE))
         return images
+
+    def eliminate_object(self, obj):
+        self.explosion_sound.stop()
+        self.collided_objects.remove(obj)
+        self.explosion_sound.play()
+
+
+
+
 
     def draw(self, screen):
         for obj in self.collided_objects:
             if obj["type"] in self.images:
                 screen.blit(self.images[obj["type"]], (obj["rect"].x, obj["rect"].y))
+
+
 
     def get_progress(self):
 
