@@ -1,4 +1,5 @@
 import pygame
+
 from Settings import *
 
 class Menu:
@@ -59,14 +60,14 @@ class Menu:
                     self.game.win_sound.stop()
                     self.game.death_sound.stop()
                     pygame.quit()
-                    exit()
+                    sys.exit()
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if restart_button[1].collidepoint(event.pos):
                         self.game.start_game()
                         return
                     if exit_button[1].collidepoint(event.pos):
                         pygame.quit()
-                        exit()
+                        sys.exit()
 
     @staticmethod
     def create_buttons(position, text, font):

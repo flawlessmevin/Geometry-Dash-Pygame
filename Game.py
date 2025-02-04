@@ -1,6 +1,6 @@
 import pygame
 
-import Settings
+
 from Player import Player
 from Levels import Level
 from Settings import *

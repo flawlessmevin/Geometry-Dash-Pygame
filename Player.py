@@ -1,5 +1,3 @@
-
-
 import pygame
 from Settings import *
 from BonusTimer import BonusTimer
