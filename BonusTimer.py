@@ -18,8 +18,8 @@ class BonusTimer:
             self.player.bonus = False
 
     def draw_bonus_timer(self,screen):
-        font = pygame.font.Font(pygame.font.get_default_font(), 50)
-        #font = pygame.font.Font(FONT, 50)
+
+        font = pygame.font.Font(FONT, 50)
         if self.player.bonus:
             remaining_time_ms = max(0, self.bonus_end_time - pygame.time.get_ticks())
             seconds = remaining_time_ms // 1000
@@ -28,5 +28,5 @@ class BonusTimer:
 
             time_str = f"{seconds}.{milliseconds // 10:02d}"
             text = font.render(time_str, True, (255, 255, 255))
-            text_rect = text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2))
+            text_rect = text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT - SCREEN_HEIGHT // 6))
             screen.blit(text, text_rect)

@@ -21,6 +21,7 @@ class Game:
         self.menu = Menu(self)
 
 
+
         self.button_text = "START"
 
         pygame.mixer.music.load("assets/sounds/background_music.mp3")
@@ -34,7 +35,7 @@ class Game:
         self.background_image = pygame.transform.scale(self.background_image, (SCREEN_WIDTH, SCREEN_HEIGHT))
 
 
-        self.menu.show_menu()
+        self.menu.show_menu(0, 0, 0)
 
     def draw_background(self):
         self.screen.blit(self.background_image, (0, 0))
@@ -85,31 +86,36 @@ class Game:
                             if self.player.get_rect().right > obj["rect"].left and self.player.get_rect().left < obj["rect"].left:
                                 self.game_status = 2
                                 self.death_sound.play()
-                                self.menu.show_menu()
+                                self.menu.show_menu(self.player.bonus_collected, self.level.eliminated_objects, self.level.get_progress())
 
                     elif obj["type"] == "^":
                         if self.player.get_rect().colliderect(obj["rect"]):
                             self.game_status = 2
                             self.death_sound.play()
-                            self.menu.show_menu()
+                            self.menu.show_menu(self.player.bonus_collected, self.level.eliminated_objects, self.level.get_progress())
 
                     elif obj["type"] == "@":
                         if self.player.get_rect().centerx >= obj["rect"].centerx:
                             self.win_sound.play()
                             self.game_status = 1
-                            self.menu.show_menu()
+                            self.menu.show_menu(self.player.bonus_collected, self.level.eliminated_objects, self.level.get_progress())
 
                     elif obj["type"] == "*":
                         if self.player.get_rect().colliderect(obj["rect"]):
                             self.level.collided_objects.remove(obj)
                             self.coin_sound.play()
-                            self.player.add_bonus_time(3000)
+                            self.player.add_bonus_time(2000)
 
                 else:
                     if obj["type"] == "*":
                         self.coin_sound.play()
                         self.level.collided_objects.remove(obj)
-                        self.player.add_bonus_time(3000)
+                        self.player.add_bonus_time(2000)
+                    elif obj["type"] == "@":
+                        if self.player.get_rect().centerx >= obj["rect"].centerx:
+                            self.win_sound.play()
+                            self.game_status = 1
+                            self.menu.show_menu(self.player.bonus_collected, self.level.eliminated_objects, self.level.get_progress())
                     elif obj["type"] == "^" or obj["type"] == "#":
                         self.level.eliminate_object(obj)
 

@@ -3,7 +3,7 @@
 import pygame
 from Settings import *
 from BonusTimer import BonusTimer
-import threading
+
 
 class Player:
     def __init__(self, x, y, image_paths=PLAYER_IMAGES):
@@ -16,6 +16,7 @@ class Player:
         self.images = [pygame.image.load(path) for path in image_paths]
         self.image = pygame.transform.scale(self.images[0], (TILE_SIZE, TILE_SIZE))
         self.bonus_timer = BonusTimer(self)
+        self.bonus_collected = 0
 
 
 
@@ -36,22 +37,34 @@ class Player:
                     self.velocity_y = 0
                     self.y = obj["rect"].top - TILE_SIZE
                     self.is_jumping = False
-                    self.image = pygame.transform.scale(self.images[0], (TILE_SIZE, TILE_SIZE))
+
 
 
         if self.y > SCREEN_HEIGHT - (SCREEN_HEIGHT/ 4) - TILE_SIZE:
             self.y = SCREEN_HEIGHT - (SCREEN_HEIGHT/ 4) - TILE_SIZE
             self.velocity_y = 0
             self.is_jumping = False
-            self.image = pygame.transform.scale(self.images[0], (TILE_SIZE, TILE_SIZE))
+
 
 
     def add_bonus_time(self, duration):
         self.bonus_timer.add_time(duration)
+        self.bonus_collected += 1
 
 
     def update(self):
         self.bonus_timer.update()
+        if self.bonus:
+            if self.is_jumping:
+                self.image = pygame.transform.scale(self.images[3], (TILE_SIZE, TILE_SIZE))
+            else:
+                self.image = pygame.transform.scale(self.images[2], (TILE_SIZE, TILE_SIZE))
+
+        else:
+            if self.is_jumping:
+                self.image = pygame.transform.scale(self.images[1], (TILE_SIZE, TILE_SIZE))
+            else:
+                self.image = pygame.transform.scale(self.images[0], (TILE_SIZE, TILE_SIZE))
 
 
     def draw(self, screen):

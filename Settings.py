@@ -23,12 +23,23 @@ LEVEL_LENGTH = int(settings.get("LEVEL_LENGTH", 20))
 
 
 
-
-FONT = "assets/fonts/ARCADECLASSIC.TTF"
+LEVEL_PATTERNS = "assets/level_patterns.txt"
+FONT = "assets/fonts/TeletactileRus.ttf"
 
 PLAYER_IMAGES = ["assets/images/sprite.png",
-                 "assets/images/sprite_jumping.png"
+                 "assets/images/sprite_jumping.png",
+                 "assets/images/sprite_bonus.png",
+                 "assets/images/sprite_bonus_jumping.png",
                 ]
+
+
+
+
+CUBE_IMAGE = "assets/images/cube.png"
+TRIANGLE_IMAGE = "assets/images/triangle.png"
+PORTAL_IMAGE = "assets/images/portal.png"
+
+
 
 
 
