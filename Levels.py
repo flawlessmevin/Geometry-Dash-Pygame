@@ -46,7 +46,7 @@ class Level:
 
         level = list(level)
         for i in range(len(level)):
-            if level[i] == "." and random.random() < 0.05:
+            if level[i] == "." and random.random() < 0.1:
                 level[i] = "*"
 
         level = "".join(level)
